@@ -1,0 +1,285 @@
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<title>Formula</title>
+<script src="formula.js"></script>
+<script>
+var f_1, f_2;
+window.onload = function () {
+	f_1 = new Formula(document.getElementById('f1'),
+						{'update':'keypress','wellform':1});
+	f_1.addExpr('e', '$a+$b*SQRT($c/$d)').compile();
+		
+	f_2 = new Formula('f2',	{'update':'change','wellform':1});
+	f_2.addExpr('d', '$a+$b*$c')
+		 .addExpr('sum', 'SUM($$d)')
+		 .addExpr('prod', 'PROD($$d)')
+		 .addExpr('min', 'MIN($$d)')
+		 .addExpr('max', 'MAX($$d)')
+		 .compile();
+}
+function addrow() {
+	var rows = document.getElementById('rows');
+	var r = document.createElement('div');
+	r.innerHTML = '<input type="text" name="a[]" />' + 
+					  ' <input type="text" name="b[]" />' +
+					  ' <input type="text" name="c[]" />' +
+					  ' <input type="text" name="d[]" />';
+	rows.appendChild(r);
+	f_2.updateElements();
+}
+</script>
+<style>
+h1, h2, p, a, form, td, html, body {
+	font-family: tahoma, arial, sans serif;
+	font-size: 12px;
+}
+h1 {
+	font-size: 16px;
+	margin: 0 0 10px 0;
+}
+h2 {
+	font-size: 14px;
+	margin: 0 0 6px 0;
+}
+#content p {
+	line-height: 150%;
+	margin-bottom: 10px;
+}
+.wrap {
+	width: 800px;
+	margin: 10px auto;
+}
+.block {
+	border: 3px solid #55d;
+	padding: 10px;
+	margin-bottom: 5px;
+	-moz-border-radius: 5px;
+}
+#content {
+	width: 550px;
+	float: left;
+}
+#sidebar {
+	width: 190px;
+	float: right;
+}
+form {
+	color: #336;
+}
+input[type=text] {
+	font-size: 11px;
+	border: 1px solid #ccd;
+}
+input[type=button] {
+	font-size: 11px;
+	border: 1px solid #77a;
+	background: #aaf;
+}
+#f1 input[type=text], #f2 input[type=text] {
+	width: 40px;
+}
+#f2 .heads span {
+	display: inline-block;
+	text-align: center;
+	width: 40px;
+	background: #eee;
+}
+pre {
+	font-size: 11px;
+}
+</style>
+
+<script type="text/javascript" src="syntaxhighlighter/scripts/shCore.js"></script>
+<script type="text/javascript" src="syntaxhighlighter/scripts/shBrushJScript.js"></script>
+<script type="text/javascript" src="syntaxhighlighter/scripts/shBrushXml.js"></script>
+<link type="text/css" rel="stylesheet" href="syntaxhighlighter/styles/shCore.css"/>
+<link type="text/css" rel="stylesheet" href="syntaxhighlighter/styles/shThemeDefault.css"/>
+<script type="text/javascript">
+	SyntaxHighlighter.config.clipboardSwf = 'syntaxhighlighter/scripts/clipboard.swf';
+	SyntaxHighlighter.all();
+</script>
+
+
+</head>
+<body>
+	<div class="wrap">
+		<div class="block" style="background: #aaf;">
+			<div style="float: left">
+				<img src="logo.png" alt="Formula" title="Formula" />
+			</div>
+			<div style="float:right; font-size: 36px; height: 36px;">}</div>
+			<div style="float: right; width: 250px; padding: 0 0;">
+				<p style="color: #225; font-size: 11px;">
+					<b>Formula</b> &mdash; библиотека для создания 
+					форм с&nbsp;автоматическим расчетом значений полей.
+				</p>
+			</div>
+			<div style="float:right; font-size: 36px; height: 36px;">{</div>
+			<div style="clear: both;" ></div>
+		</div>
+		<div class="block" id="content">
+			<div class="volume">
+				<h1>Обзор</h1>
+				<p>
+					<b>Formula</b> предоставляет набор инструментов для создания форм
+					требующих рассчета значений одний полей в зависимости от значений 
+					других полей. Примерами таких форм могут быть чеки на заказ 
+					товаров в интернет-магазинах, отчетные формы, прстые формы 
+					арифметических рассчетов и т.д.
+				</p>
+			</div>
+			<div class="volume">
+				<h1>Примеры использования</h1>
+				<h2>Пример 1 &mdash; Простой рассчет</h2>
+				<p>
+					Попробуйте изменить значение одного из полей, расположенных ниже:
+				</p>
+				<form id="f1">
+					<input type="text" name="a" value="5" /> + 
+					<input type="text" name="b" value="20" /> *
+					SQRT(<input type="text" name="c" value="16" /> /
+					<input type="text" name="d" value="4" />) =
+					<input type="text" name="e" value="" style="width: 110px;"/>
+				</form>
+				<p>
+					Исходный код примера:
+				</p>
+<pre class="brush: html">&lt;form id=&quot;f1&quot;&gt;
+	&lt;input type=&quot;text&quot; name=&quot;a&quot; value=&quot;5&quot; /&gt; + 
+	&lt;input type=&quot;text&quot; name=&quot;b&quot; value=&quot;20&quot; /&gt; *
+	SQRT(&lt;input type=&quot;text&quot; name=&quot;c&quot; value=&quot;16&quot; /&gt; /
+	&lt;input type=&quot;text&quot; name=&quot;d&quot; value=&quot;4&quot; /&gt;) =
+	&lt;input type=&quot;text&quot; name=&quot;e&quot; value=&quot;&quot; style=&quot;width: 110px;&quot;/&gt;
+&lt;/form&gt;
+</pre>
+				<p>Код инициализации формы:</p>
+<pre class="brush: jscript">
+var f = new Formula(document.getElementById('f1'),
+				{'update':'keypress','wellform':1});
+f.addExpr('e', '$a+$b*SQRT($c/$d)').compile();
+</pre>
+				<p>
+					В этом примере переменные выражения, начинающиеся с символа 
+					&laquo;$&raquo;, соответствуют полям формы с соответствующими
+					именами.
+				</p>
+				<h2>Пример 2 &mdash; Табличный рассчет</h2>
+				<form id="f2">
+					<table>
+						<tr valign="top">
+							<td>
+								<div class="heads">
+									<span>A</span>
+									<span>B</span>
+									<span>C</span>
+									<span>D</span>
+								</div>
+								<div id="rows">
+									<div>
+										<input type="text" value="4" name="a[]" />
+										<input type="text" value="6" name="b[]" />
+										<input type="text" value="9" name="c[]" />
+										<input type="text" name="d[]" />
+									</div>
+									<div>
+										<input type="text" value="3" name="a[]" />
+										<input type="text" value="11" name="b[]" />
+										<input type="text" value="7" name="c[]" />
+										<input type="text" name="d[]" />
+									</div>
+								</div>
+								<br />
+								<input type="button" onclick="addrow();" value="Добавить" />
+								<input type="button" onclick="f_2.update();" value="Обновить" />
+							</td>
+							<td>&nbsp;</td>
+							<td>
+								<b>D = A + B * C</b>
+								<br />
+								SUM(D) = <input type="text" name="sum" />
+								<br />
+								PROD(D) = <input type="text" name="prod" />
+								<br />
+								MIN(D) = <input type="text" name="min" />
+								<br />
+								MAX(D) = <input type="text" name="max" />
+							</td>
+						</tr>
+					</table>
+				</form>
+				<p>Исходный код примера:</p>
+<pre class="brush: html">&lt;form id=&quot;f2&quot;&gt;
+	&lt;table&gt;
+		&lt;tr valign=&quot;top&quot;&gt;
+			&lt;td&gt;
+				&lt;div class=&quot;heads&quot;&gt;
+					&lt;span&gt;A&lt;/span&gt;
+					&lt;span&gt;B&lt;/span&gt;
+					&lt;span&gt;C&lt;/span&gt;
+					&lt;span&gt;D&lt;/span&gt;
+				&lt;/div&gt;
+				&lt;div id=&quot;rows&quot;&gt;
+					&lt;div&gt;
+						&lt;input type=&quot;text&quot; value=&quot;4&quot; name=&quot;a[]&quot; /&gt;
+						&lt;input type=&quot;text&quot; value=&quot;6&quot; name=&quot;b[]&quot; /&gt;
+						&lt;input type=&quot;text&quot; value=&quot;9&quot; name=&quot;c[]&quot; /&gt;
+						&lt;input type=&quot;text&quot; name=&quot;d[]&quot; /&gt;
+					&lt;/div&gt;
+					&lt;div&gt;
+						&lt;input type=&quot;text&quot; value=&quot;3&quot; name=&quot;a[]&quot; /&gt;
+						&lt;input type=&quot;text&quot; value=&quot;11&quot; name=&quot;b[]&quot; /&gt;
+						&lt;input type=&quot;text&quot; value=&quot;7&quot; name=&quot;c[]&quot; /&gt;
+						&lt;input type=&quot;text&quot; name=&quot;d[]&quot; /&gt;
+					&lt;/div&gt;
+				&lt;/div&gt;
+				&lt;br /&gt;
+				&lt;input type=&quot;button&quot; onclick=&quot;addrow();&quot; value=&quot;Добавить&quot; /&gt;
+				&lt;input type=&quot;button&quot; onclick=&quot;f_2.update();&quot; value=&quot;Обновить&quot; /&gt;
+			&lt;/td&gt;
+			&lt;td&gt;&nbsp;&lt;/td&gt;
+			&lt;td&gt;
+				&lt;b&gt;D = A + B * C&lt;/b&gt;
+				&lt;br /&gt;
+				SUM(D) = &lt;input type=&quot;text&quot; name=&quot;sum&quot; /&gt;
+				&lt;br /&gt;
+				PROD(D) = &lt;input type=&quot;text&quot; name=&quot;prod&quot; /&gt;
+				&lt;br /&gt;
+				MIN(D) = &lt;input type=&quot;text&quot; name=&quot;min&quot; /&gt;
+				&lt;br /&gt;
+				MAX(D) = &lt;input type=&quot;text&quot; name=&quot;max&quot; /&gt;
+			&lt;/td&gt;
+		&lt;/tr&gt;
+	&lt;/table&gt;
+&lt;/form&gt;</pre>
+				<p>Код Javascript:</p>
+<pre class="brush: jscript">var f_2 = new Formula('f2',	{'update':'change','wellform':1});
+f_2.addExpr('d', '$a+$b*$c')
+	 .addExpr('sum', 'SUM($$d)')
+	 .addExpr('prod', 'PROD($$d)')
+	 .addExpr('min', 'MIN($$d)')
+	 .addExpr('max', 'MAX($$d)')
+	 .compile();
+function addrow() {
+	var rows = document.getElementById('rows');
+	var r = document.createElement('div');
+	r.innerHTML = '<input type="text" name="a[]" />' + 
+					  ' <input type="text" name="b[]" />' +
+					  ' <input type="text" name="c[]" />' +
+					  ' <input type="text" name="d[]" />';
+	rows.appendChild(r);
+	f_2.updateElements();
+}
+</pre>
+				<p>
+					В этом примере переменные, которым предшествует &laquo;$$&raquo;
+					обрабатываются как массивы.
+				</p>
+			</div>
+		</div>
+		<div class="block" id="sidebar">
+			Sidebar
+		</div>
+	</div>
+</body>
+</html>
