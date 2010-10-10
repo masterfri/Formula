@@ -7,10 +7,22 @@
 var f_1, f_2;
 window.onload = function () {
 	f_1 = new Formula(document.getElementById('f1'),
-						{'update':'keypress','wellform':1});
+						{'update':DO_KEYPRESS,'check':DO_KEYPRESS,
+						'wellform':1, 'err_handler': function(err, el){
+							el.style.background = err == '' ? 'white' : 'red';
+						}});
 	f_1.addExpr('e', '$a+$b*SQRT($c/$d)').compile();
+	f_1.setRule('d', ['neq',0, 
+							'or',[
+								'and',['gt',0, 'depend','c',['gt',0]],
+								'and',['lt',0, 'depend','c',['lt',0]]
+							]]).
+		 setRule('c', ['or',[
+								'and',['gt',0, 'depend','d',['gt',0]],
+								'and',['lt',0, 'depend','d',['lt',0]]
+							]]);
 		
-	f_2 = new Formula('f2',	{'update':'change','wellform':1});
+	f_2 = new Formula('f2',	{'update':DO_CHANGE,'wellform':1});
 	f_2.addExpr('d', '$a+$b*$c')
 		 .addExpr('sum', 'SUM($$d)')
 		 .addExpr('prod', 'PROD($$d)')
@@ -143,7 +155,9 @@ pre {
 					<input type="text" name="e" value="" style="width: 110px;"/>
 				</form>
 				<p>
-					Исходный код примера:
+					На поля "c" и "d" наложены правила: d не должно быть равно нулю
+					и они должны иметь одинаковый знак. Если поля заполнены неправильно, они 
+					подсвечиваются красным.	Исходный код примера:
 				</p>
 <pre class="brush: html">&lt;form id=&quot;f1&quot;&gt;
 	&lt;input type=&quot;text&quot; name=&quot;a&quot; value=&quot;5&quot; /&gt; + 
@@ -155,9 +169,21 @@ pre {
 </pre>
 				<p>Код инициализации формы:</p>
 <pre class="brush: jscript">
-var f = new Formula(document.getElementById('f1'),
-				{'update':'keypress','wellform':1});
+f = new Formula(document.getElementById('f1'),
+			{'update':DO_KEYPRESS,'check':DO_KEYPRESS,
+			'wellform':1, 'err_handler': function(err, el){
+				el.style.background = err == '' ? 'white' : 'red';
+			}});
 f.addExpr('e', '$a+$b*SQRT($c/$d)').compile();
+f.setRule('d', ['neq',0, 
+					'or',[
+						'and',['gt',0, 'depend','c',['gt',0]],
+						'and',['lt',0, 'depend','c',['lt',0]]
+					]]).
+  setRule('c', ['or',[
+						'and',['gt',0, 'depend','d',['gt',0]],
+						'and',['lt',0, 'depend','d',['lt',0]]
+					]]);
 </pre>
 				<p>
 					В этом примере переменные выражения, начинающиеся с символа 
@@ -253,7 +279,7 @@ f.addExpr('e', '$a+$b*SQRT($c/$d)').compile();
 	&lt;/table&gt;
 &lt;/form&gt;</pre>
 				<p>Код Javascript:</p>
-<pre class="brush: jscript">var f_2 = new Formula('f2',	{'update':'change','wellform':1});
+<pre class="brush: jscript">var f_2 = new Formula('f2',	{'update':DO_CHANGE,'wellform':1});
 f_2.addExpr('d', '$a+$b*$c')
 	 .addExpr('sum', 'SUM($$d)')
 	 .addExpr('prod', 'PROD($$d)')
