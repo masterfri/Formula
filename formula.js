@@ -84,6 +84,14 @@ const DO_MANUAL = 1;
 const DO_KEYPRESS = 2;
 const DO_CHANGE = 3;
 
+// Определение класса Expression
+Formula_Expression = function (varn, expr) {
+	this.varn = varn;
+	this.target = null;
+	this.expr = expr;
+	this.func = null;
+}
+
 // Определение класса Fromula
 Formula = function (form, conf) {
 	if (typeof form == 'string') {
@@ -96,7 +104,8 @@ Formula = function (form, conf) {
 	conf = conf || {};
 	this.form = form;			// форма
 	this.elements = {};		// элементы формы
-	this.expressions = [];	// выражения
+	this.expressions = {};	// выражения
+	this._expressions = []; // массив ссылок на выражения
 	this.rules = {};			// правила
 	this.depend = {};			// зависимости
 	this.update_list = [];	// список элементов для обновления
@@ -110,15 +119,9 @@ Formula = function (form, conf) {
 }
 
 Formula.prototype = {
-	// Добавление выражения
+	// добавление выражения
 	addExpr : function (varn, expr) {
-		this.expressions.push({
-			'varn' : varn,
-			'target' : null,
-			'expr' : expr,
-			'func' : null
-		});
-		return this;
+		return this.setExpr(varn, expr);
 	},
 	// Загрузка формул и правил из атрибутов элементов
 	_autoload : function () {
@@ -230,8 +233,8 @@ Formula.prototype = {
 		var i, ex, vars, code, j, k, el, dep, __T = this;
 		this.elements = {};
 		this.depend = {}
-		for (i = 0; i < this.expressions.length; i++) {
-			ex = this.expressions[i];
+		for (i = 0; i < this._expressions.length; i++) {
+			ex = this._expressions[i];
 			// собираем элементы
 			if (! this.elements[ex.varn]) {
 				this.elements[ex.varn] = this._collect(ex.varn);
@@ -277,16 +280,20 @@ Formula.prototype = {
 		if ('' == err) return;
 		alert(el.name + ' has errors!');
 	},
+	// удаление всех выражений
+	deleteAllExpr : function () {
+		this.expressions = {};
+		this._expressions = [];
+		this.depend = {};
+	},
 	// удаление выражения
 	deleteExpr : function (varn) {
-		var newexpr = [];
-		for (i = 0; i < this.expressions.length; i++) {
-			ex = this.expressions[i];
-			if (ex.varn != varn) {
-				newexpr.push(ex);
-			}
+		delete this.expressions[varn];
+		var i;
+		this._expressions = [];
+		for (i in this.expressions) {
+			this._expressions.push(this.expressions[i]);
 		}
-		this.expressions = newexpr;
 		return this;
 	},
 	// нормализация имени элемента
@@ -362,13 +369,7 @@ Formula.prototype = {
 	},
 	// получение выражения для элемента
 	_getExpr : function (varn) {
-		var i;
-		for (i = 0; i < this.expressions.length; i++) {
-			if (this.expressions[i].varn == varn) {
-				return this.expressions[i];
-			}
-		}
-		return null;
+		return this.expressions[varn];
 	},
 	// получение значения переменной
 	_gv : function (i, varn) {
@@ -413,6 +414,17 @@ Formula.prototype = {
 				}
 			}
 		}
+	},
+	// Создание выражения
+	setExpr : function (varn, expr) {
+		this.expressions[varn] = {
+			'varn' : varn,
+			'target' : null,
+			'expr' : expr,
+			'func' : null
+		};
+		this._expressions.push(this.expressions[varn]);
+		return this;
 	},
 	// создание правила
 	setRule : function (varn, rule) {
@@ -465,7 +477,7 @@ Formula.prototype = {
 	},
 	// полное обновление
 	update : function () {
-		this.update_list = this.expressions;
+		this.update_list = this._expressions;
 		this._update();
 		return this;
 	},
@@ -481,17 +493,18 @@ Formula.prototype = {
 	},
 	// обновление списка элементов
 	updateElements : function (then_update) {
-		var i;
+		var i, ex;
 		for (i in this.elements) {
 			this.elements[i] = this._collect(i);
 		}
-		for (i = 0; i < this.expressions.length; i++) {
-			this.expressions[i].target = this.elements[this.expressions[i].varn];
+		for (i = 0; i < this._expressions.length; i++) {
+			ex = this._expressions[i];
+			ex.target = this.elements[ex.varn];
 		}
 		// вешаем события
 		this._bind();
 		if (then_update) {
-			// пересчитываем значения, сли надо
+			// пересчитываем значения, если надо
 			this.update();
 		}
 		return this;
